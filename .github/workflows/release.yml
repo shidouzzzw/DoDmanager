@@ -5,6 +5,10 @@ on:
   push:
     tags:
       - 'v*'
+    # Etiket push edilemediğinde aynı iş akışı release/v0.1.0 dalından çalışır;
+    # sürüm etiketi GitHub Release oluşturulurken otomatik atılır.
+    branches:
+      - 'release/**'
   workflow_dispatch:
 
 permissions:
@@ -16,6 +20,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
+      - name: Sürüm etiketini belirle
+        id: version
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            TAG="$GITHUB_REF_NAME"
+          else
+            TAG="${GITHUB_REF_NAME#release/}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Sürüm: $TAG"
 
       - uses: actions/setup-node@v4
         with:
@@ -78,7 +93,7 @@ jobs:
             echo "APK bulunamadı" >&2
             exit 1
           fi
-          NAME="Dosya-Dolabi-${GITHUB_REF_NAME}.apk"
+          NAME="Dosya-Dolabi-${{ steps.version.outputs.tag }}.apk"
           cp "$APK" "$NAME"
           sha256sum "$NAME" > "$NAME.sha256"
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
@@ -90,7 +105,8 @@ jobs:
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          name: Dosya Dolabı ${{ github.ref_name }}
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Dosya Dolabı ${{ steps.version.outputs.tag }}
           generate_release_notes: true
           files: |
             ${{ steps.artifact.outputs.name }}
