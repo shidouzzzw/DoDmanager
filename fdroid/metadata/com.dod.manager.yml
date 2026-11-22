@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# F-Droid build recipe. Copy to fdroiddata/metadata/com.dod.manager.yml.
+Categories:
+  - System
+License: GPL-3.0-or-later
+AuthorName: DoD Manager Contributors
+WebSite: https://github.com/shidouzzzw/DoDmanager
+SourceCode: https://github.com/shidouzzzw/DoDmanager
+IssueTracker: https://github.com/shidouzzzw/DoDmanager/issues
+Changelog: https://github.com/shidouzzzw/DoDmanager/blob/main/CHANGELOG.md
+
+AutoName: Dosya Dolabı
+
+RepoType: git
+Repo: https://github.com/shidouzzzw/DoDmanager.git
+
+Builds:
+  - versionName: 0.1.0
+    versionCode: 1
+    commit: v0.1.0
+    subdir: src-tauri
+    ndk: r27b
+    sudo:
+      - apt-get update
+      - apt-get install -y nodejs npm
+    prebuild:
+      - npm ci --prefix ..
+      - rustup target add aarch64-linux-android
+      - npx tauri android init
+      - bash ../scripts/android-setup.sh
+    build:
+      - cd gen/android && ./gradlew assembleRelease
+    output: gen/android/app/build/outputs/apk/universal/release/*.apk
+    rm:
+      - node_modules
+      - ../node_modules
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 0.1.0
+CurrentVersionCode: 1

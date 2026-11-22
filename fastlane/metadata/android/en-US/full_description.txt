@@ -1,0 +1,24 @@
+Dosya Dolabı is an offline, open source file manager that works on the real files on your phone.
+
+It requests no internet permission, shows no ads and collects no data. Everything happens on your device.
+
+FEATURES
+- Folder navigation, breadcrumbs and Android back gesture
+- Grid and list views; sort by name, date, size or type
+- Type filters: images, video, documents, audio, archives
+- Long press multi-select, drag to select a range, select all
+- Copy, move, rename, move to trash, delete permanently
+- Create and extract zip archives
+- Preview images, video, audio, PDF, text, code and markdown
+- Swipe between files in the same folder while previewing
+- System share and "Open with"; receive files from other apps
+- Favorites, recents, in-app trash and undo
+- Storage summary and smooth scrolling in large folders
+- Light, dark and system themes; wallpaper accent color on Android 12+
+- Turkish interface with an English translation
+
+ACCESS
+By default the app can only access the folder you pick (Scoped Storage / SAF). You may optionally enable "All files access" in settings. The active mode is always shown in settings.
+
+PRIVACY
+The app is fully offline and has no INTERNET permission. It is free software under GPL-3.0-or-later; the source code is public.

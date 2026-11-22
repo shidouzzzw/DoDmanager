@@ -1,0 +1,6 @@
+İlk sürüm.
+- Gerçek dosya sistemi üzerinde gezinme, kopyalama, taşıma, silme, zip işlemleri
+- SAF ve isteğe bağlı tüm dosyalara erişim modu
+- Görsel, video, ses, PDF, metin ve markdown önizlemesi
+- Paylaşım, birlikte aç ve diğer uygulamalardan dosya alma
+- Favoriler, son kullanılanlar, çöp kutusu ve geri alma

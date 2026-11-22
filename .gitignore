@@ -1,0 +1,26 @@
+# Bağımlılıklar
+node_modules/
+# Derleme çıktıları
+dist/
+src-tauri/target/
+src-tauri/gen/schemas/
+src-tauri/gen/android/.gradle/
+src-tauri/gen/android/app/build/
+src-tauri/gen/android/build/
+src-tauri/gen/android/local.properties
+src-tauri/gen/android/.idea/
+src-tauri/gen/android/.kotlin/
+*.apk
+*.aab
+*.keystore
+*.jks
+# Geliştirici ayarları
+.env
+.env.*
+!.env.example
+.DS_Store
+coverage/
+.vite/
+
+# Tauri tarafından üretilen Android iskeleti (scripts/android-setup.sh oluşturur)
+src-tauri/gen/

@@ -1,0 +1,24 @@
+Dosya Dolabı, telefonunuzdaki gerçek dosyaları yöneten çevrimdışı ve açık kaynaklı bir dosya yöneticisidir.
+
+İnternet izni istemez, reklam göstermez, veri toplamaz. Tüm işlemler cihazınızda kalır.
+
+ÖZELLİKLER
+- Klasör gezinme, breadcrumb ve Android geri hareketi
+- Izgara ve liste görünümü; ada, tarihe, boyuta ve türe göre sıralama
+- Tür filtresi: görsel, video, belge, ses, arşiv
+- Uzun basarak çoklu seçim, parmakla aralık seçimi, tümünü seç
+- Kopyala, taşı, yeniden adlandır, çöp kutusuna sil, kalıcı sil
+- Zip oluştur ve zip'ten çıkar
+- Görsel, video, ses, PDF, metin, kod ve markdown önizlemesi
+- Önizlemede aynı klasördeki dosyalar arasında kaydırarak geçiş
+- Sistem paylaşımı ve "Birlikte aç"; diğer uygulamalardan dosya alma
+- Favoriler, son kullanılanlar, uygulama içi çöp kutusu ve geri alma
+- Depolama özeti ve büyük klasörlerde akıcı kaydırma
+- Açık, koyu ve sistem teması; Android 12 ve üzerinde duvar kağıdı rengi
+- Türkçe arayüz, isteğe bağlı İngilizce
+
+ERİŞİM
+Varsayılan olarak yalnızca seçtiğiniz klasöre erişir (Scoped Storage / SAF). İsterseniz ayarlardan "Tüm dosyalara erişim" modunu açabilirsiniz. Hangi modda olduğunuz her zaman ayarlarda görünür.
+
+GİZLİLİK
+Uygulama tamamen çevrimdışıdır ve INTERNET izni yoktur. GPL-3.0-or-later lisansıyla özgür yazılımdır; kaynak kodu herkese açıktır.

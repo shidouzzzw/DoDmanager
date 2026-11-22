@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<resources>
+    <color name="dod_paper">#F4EFE4</color>
+    <color name="dod_ink">#191C21</color>
+    <color name="dod_accent">#34499B</color>
+</resources>

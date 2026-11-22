@@ -1,0 +1,15 @@
+{
+  "$schema": "../gen/schemas/mobile-schema.json",
+  "identifier": "android-main",
+  "description": "Dosya Dolabı Android yetkileri: yalnızca çekirdek, diyalog, açıcı ve titreşim. Dosya erişimi fs eklentisine verilmez; tüm dosya işlemleri Rust komutlarından geçer.",
+  "platforms": ["android"],
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:event:default",
+    "dialog:allow-ask",
+    "opener:allow-open-url",
+    "opener:allow-open-path",
+    "haptics:default"
+  ]
+}

@@ -1,0 +1,6 @@
+First release.
+- Browse, copy, move, delete and zip on the real file system
+- SAF and optional all-files access modes
+- Image, video, audio, PDF, text and markdown previews
+- Share, open with, and receive files from other apps
+- Favorites, recents, trash and undo
