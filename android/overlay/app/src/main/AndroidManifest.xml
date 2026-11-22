@@ -33,7 +33,7 @@
         android:resizeableActivity="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.DosyaDolabi"
-        android:usesCleartextTraffic="false">
+        android:usesCleartextTraffic="${usesCleartextTraffic}">
 
         <activity
             android:name=".MainActivity"

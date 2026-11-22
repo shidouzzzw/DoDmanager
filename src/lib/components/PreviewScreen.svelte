@@ -3,6 +3,7 @@
   import { onDestroy } from 'svelte';
   import { t } from '../i18n';
   import { assetUrl, openWith, previewAsset, readFile } from '../services/files';
+  import { openExternal } from '../services/settings';
   import { middleEllipsis } from '../services/format';
   import { app } from '../state/app.svelte';
   import type { ReadFileResult } from '../types';
@@ -239,7 +240,7 @@
     event.preventDefault();
     const href = anchor.getAttribute('href');
     if (!href) return;
-    void import('../services/settings').then((module) => module.openExternal(href)).catch(() => {});
+    void openExternal(href).catch(() => {});
   }
 
   const rendered = $derived(

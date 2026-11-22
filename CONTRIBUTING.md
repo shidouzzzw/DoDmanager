@@ -14,7 +14,7 @@ rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-andro
 npm run tauri android dev
 ```
 
-Android SDK 36, NDK r27b, JDK 17 ve Rust 1.85+ gerekir. `ANDROID_HOME`, `NDK_HOME`,
+Android SDK 36, NDK r27c, JDK 17 ve Rust 1.85+ gerekir. `ANDROID_HOME`, `NDK_HOME`,
 `JAVA_HOME` tanımlı olmalıdır.
 
 ## Kod stili

@@ -16,7 +16,7 @@
   import SettingsScreen from './lib/components/SettingsScreen.svelte';
   import Snackbar from './lib/components/Snackbar.svelte';
   import TrashScreen from './lib/components/TrashScreen.svelte';
-  import { openAppSettings, requestAllFilesAccess } from './lib/services/settings';
+  import { accessStatus, openAppSettings, requestAllFilesAccess } from './lib/services/settings';
   import { cancelJob } from './lib/services/files';
 
   let unlisten: (() => void)[] = [];
@@ -63,7 +63,6 @@
     // Sistem ayarlarından dönünce izin durumunu tazele.
     const onVisible = async () => {
       if (document.visibilityState !== 'visible') return;
-      const { accessStatus } = await import('./lib/services/settings');
       app.access = await accessStatus().catch(() => app.access);
       await app.refreshLocations();
       await app.checkIncoming();

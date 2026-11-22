@@ -19,7 +19,7 @@ Builds:
     versionCode: 1
     commit: v0.1.0
     subdir: src-tauri
-    ndk: r27b
+    ndk: r27c
     sudo:
       - apt-get update
       - apt-get install -y nodejs npm

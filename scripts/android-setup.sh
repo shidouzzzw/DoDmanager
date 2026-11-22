@@ -37,8 +37,8 @@ cp "$OVERLAY/app/src/main/java/com/dod/manager/AndroidFsPlugin.kt" "$GEN/app/src
 cp "$OVERLAY/app/src/main/AndroidManifest.xml" "$GEN/app/src/main/AndroidManifest.xml"
 mkdir -p "$GEN/app/src/debug"
 cp "$OVERLAY/app/src/debug/AndroidManifest.xml" "$GEN/app/src/debug/AndroidManifest.xml"
+cp "$OVERLAY/app/dod-rules.pro" "$GEN/app/dod-rules.pro"
 cp -R "$OVERLAY/app/src/main/res/." "$GEN/app/src/main/res/"
-cp -R "$ROOT/src-tauri/icons/." "$GEN/app/src/main/res/drawable/" 2>/dev/null || true
 
 echo "→ Gradle ayarları (minSdk 26, targetSdk 36, documentfile)"
 python3 - "$GEN" <<'PY'

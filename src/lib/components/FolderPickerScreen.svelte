@@ -83,9 +83,11 @@
           ? t('snackbar.copied', { count: moved.length })
           : t('snackbar.moved', { count: moved.length }),
       );
+      const back = intent.returnScreen;
       app.picker = null;
-      app.screen = 'browser';
-      await app.reload();
+      app.screen = back;
+      if (back === 'browser') await app.reload();
+      else await app.refreshHome();
     } catch (e) {
       app.fail(e);
     } finally {

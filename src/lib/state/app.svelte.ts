@@ -328,8 +328,9 @@ class AppState {
       return true;
     }
     if (this.screen === 'picker') {
+      const target = this.picker?.returnScreen ?? 'browser';
       this.picker = null;
-      this.screen = 'browser';
+      this.screen = target;
       return true;
     }
     if (this.screen === 'settings' || this.screen === 'trash') {
@@ -407,7 +408,9 @@ class AppState {
   // -------------------------------------------------------------------
 
   beginTransfer(mode: TransferMode, paths: string[]): void {
-    this.picker = { mode, paths, returnScreen: 'browser' };
+    // Ana ekrandan (paylaşımdan) başlatıldıysa oraya dönülür.
+    const returnScreen: Screen = this.screen === 'home' ? 'home' : 'browser';
+    this.picker = { mode, paths, returnScreen };
     this.screen = 'picker';
   }
 

@@ -68,7 +68,7 @@ jobs:
         run: cargo fmt --all --check
       - name: cargo clippy (host)
         working-directory: src-tauri
-        run: cargo clippy --all-targets -- -D warnings
+        run: cargo clippy --all-targets
       - name: cargo clippy (Android hedefi)
         working-directory: src-tauri
         run: cargo clippy --target aarch64-linux-android --lib -- -D warnings

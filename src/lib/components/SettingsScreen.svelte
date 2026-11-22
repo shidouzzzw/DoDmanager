@@ -5,6 +5,7 @@
   import { formatSize } from '../services/format';
   import {
     accessStatus,
+    dynamicAccent,
     openAppSettings,
     openExternal,
     requestAllFilesAccess,
@@ -48,9 +49,7 @@
       return;
     }
     app.dynamicColorValue = null;
-    const color = await import('../services/settings')
-      .then((module) => module.dynamicAccent())
-      .catch(() => null);
+    const color = await dynamicAccent().catch(() => null);
     if (!color) {
       app.toast(t('settings.dynamicUnavailable'));
       return;

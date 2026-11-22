@@ -78,7 +78,7 @@ görsel tutulmaz; uygulama çalıştırıldıktan sonra gerçek ekran görüntü
 | JDK                  | 17                                    |
 | Android SDK Platform | 36                                    |
 | Android Build Tools  | 36.0.0                                |
-| Android NDK          | 27.2.12479018 (r27b)                  |
+| Android NDK          | 27.2.12479018 (r27c)                  |
 | Tauri CLI            | `@tauri-apps/cli` 2.x (devDependency) |
 
 `ANDROID_HOME` (veya `ANDROID_SDK_ROOT`), `NDK_HOME` ve `JAVA_HOME` tanımlı olmalıdır.
@@ -232,7 +232,7 @@ yakalar. Weblate/Crowdin için dosya biçimi düz JSON'dur (iç içe nesne yok).
 1. `fastlane/metadata/android/{tr-TR,en-US}` metinleri ve ekran görüntüleri hazırdır.
 2. `fdroid/metadata/com.dod.manager.yml` dosyasını `fdroiddata` deposuna
    `metadata/com.dod.manager.yml` olarak kopyalayın.
-3. `fdroid build com.dod.manager` ile deneyin; tarif NDK r27, JDK 17 ve Node 20 ister.
+3. `fdroid build com.dod.manager` ile deneyin; tarif NDK r27c, JDK 17 ve Node 20 ister.
 4. Sürüm etiketi (`v0.1.0`) F-Droid'in "Auto Update Mode: Version" satırıyla eşleşir.
 
 Tarif kaynaktan derler: `npm ci` → `tauri android build --apk`. Kapalı ikili yoktur;
