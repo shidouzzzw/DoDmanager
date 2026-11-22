@@ -24,3 +24,7 @@ coverage/
 
 # Tauri tarafından üretilen Android iskeleti (scripts/android-setup.sh oluşturur)
 src-tauri/gen/
+
+# Yerel imza anahtarı ve geçici doğrulama dosyaları (asla commit edilmez)
+signing/
+tmpverify/

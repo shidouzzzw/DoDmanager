@@ -61,6 +61,45 @@ text = re.sub(r"(minSdk(?:Version)?\s*=?\s*)\d+", r"\g<1>26", text, count=1)
 text = re.sub(r"(targetSdk(?:Version)?\s*=?\s*)\d+", r"\g<1>36", text, count=1)
 text = re.sub(r"(compileSdk(?:Version)?\s*=?\s*)\d+", r"\g<1>36", text, count=1)
 
+# Release imzası: keystore.properties varsa oku, yoksa hiçbir şey yapma.
+# Yarım yapılandırma (storeFile yok) build'i bozmaz; atama yalnızca storeFile
+# okunabildiğinde yapılır ve release build tipi yalnızca o zaman bağlanır.
+if "dod-signing" not in text and gradle.suffix == ".kts":
+    # java.util.Properties Kotlin DSL'de 'java' eklentisi tarafından gölgelenir;
+    # bu yüzden basit anahtar=değer okuyucusu kullanılır.
+    signing_block = '''    // dod-signing: keystore.properties varsa release imzasını bağla
+    signingConfigs {
+        val dodPropsFile = rootProject.file("keystore.properties")
+        val dodProps = mutableMapOf<String, String>()
+        if (dodPropsFile.exists()) {
+            dodPropsFile.readLines().forEach { dodLine ->
+                val dodTrim = dodLine.trim()
+                if (dodTrim.isNotEmpty() && !dodTrim.startsWith("#")) {
+                    val dodEq = dodTrim.indexOf('=')
+                    if (dodEq > 0) {
+                        dodProps[dodTrim.substring(0, dodEq).trim()] =
+                            dodTrim.substring(dodEq + 1).trim()
+                    }
+                }
+            }
+        }
+        val dodStore = dodProps["storeFile"]
+        if (dodStore != null) {
+            val dodSigning = findByName("release") ?: create("release")
+            dodSigning.storeFile = rootProject.file(dodStore)
+            dodSigning.storePassword = dodProps["storePassword"]
+            dodSigning.keyAlias = dodProps["keyAlias"]
+            dodSigning.keyPassword = dodProps["keyPassword"]
+        }
+    }
+'''
+    text = text.replace("android {\n", "android {\n" + signing_block, 1)
+    text = text.replace(
+        'getByName("release") {',
+        'getByName("release") {\n            // dod-signing\n            signingConfig = signingConfigs.findByName("release")?.takeIf { it.storeFile != null }',
+        1,
+    )
+
 if "androidx.documentfile" not in text:
     if gradle.suffix == ".kts":
         text += '\n\ndependencies {\n    implementation("androidx.documentfile:documentfile:1.1.0")\n}\n'

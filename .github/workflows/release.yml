@@ -6,7 +6,7 @@ on:
     tags:
       - 'v*'
     # Etiket push edilemediğinde aynı iş akışı release/v0.1.0 dalından çalışır;
-    # sürüm etiketi GitHub Release oluşturulurken otomatik atılır.
+    # sürüm etiketi GitHub Release oluşturulurken atılır.
     branches:
       - 'release/**'
   workflow_dispatch:
@@ -16,7 +16,7 @@ permissions:
 
 jobs:
   apk:
-    name: APK derle ve yayınla
+    name: APK derle, imzala ve yayınla
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -71,61 +71,143 @@ jobs:
       - name: Android iskeleti + katman
         run: ./scripts/android-setup.sh
 
-      - name: İmza yapılandırması (varsa)
+      - name: APK derle
+        run: npm run tauri android build -- --apk
+
+      - name: APK'yı imzala ve doğrula
+        id: sign
         env:
+          TAG: ${{ steps.version.outputs.tag }}
           ANDROID_KEY_BASE64: ${{ secrets.ANDROID_KEY_BASE64 }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          if [ -z "${ANDROID_KEY_BASE64:-}" ]; then
-            echo "İmza secret'ı yok: imzasız APK üretilecek."
-            exit 0
+          set -euo pipefail
+          BT="$ANDROID_HOME/build-tools/36.0.0"
+          ALIGN="$BT/zipalign"
+          SIGNER="$BT/apksigner"
+
+          SRC=$(find src-tauri/gen/android/app/build/outputs/apk -name '*universal*release*.apk' | head -1)
+          if [ -z "$SRC" ]; then
+            SRC=$(find src-tauri/gen/android/app/build/outputs/apk -name '*release*.apk' | head -1)
           fi
-          echo "$ANDROID_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
-          cat > src-tauri/gen/android/keystore.properties <<EOF
-          storeFile=$RUNNER_TEMP/release.jks
-          storePassword=$ANDROID_STORE_PASSWORD
-          keyAlias=$ANDROID_KEY_ALIAS
-          keyPassword=$ANDROID_KEY_PASSWORD
-          EOF
-
-      - name: APK derle
-        run: npm run tauri android build -- --apk
-
-      - name: APK'yı topla
-        id: artifact
-        run: |
-          APK=$(find src-tauri/gen/android/app/build/outputs/apk -name '*release*.apk' | head -1)
-          if [ -z "$APK" ]; then
-            echo "APK bulunamadı" >&2
+          if [ -z "$SRC" ]; then
+            echo "Release APK bulunamadı" >&2
             exit 1
           fi
-          NAME="Dosya-Dolabi-${{ steps.version.outputs.tag }}.apk"
-          cp "$APK" "$NAME"
-          sha256sum "$NAME" > "$NAME.sha256"
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "Kaynak APK: $SRC"
 
-      - name: İmza dosyasını sil
+          # İmza öncesi hizalama (v2 imzası hizalamadan sonra atılmalı).
+          "$ALIGN" -p -f 4 "$SRC" aligned.apk
+
+          if [ -n "${ANDROID_KEY_BASE64:-}" ]; then
+            echo "$ANDROID_KEY_BASE64" | base64 -d > "$RUNNER_TEMP/release.jks"
+            KS="$RUNNER_TEMP/release.jks"
+            ALIAS="$ANDROID_KEY_ALIAS"
+            KS_PASS="$ANDROID_STORE_PASSWORD"
+            KEY_PASS="$ANDROID_KEY_PASSWORD"
+            KIND="permanent"
+            echo "APK kalıcı sürüm anahtarıyla imzalanacak."
+          else
+            KS="$RUNNER_TEMP/temp-release.jks"
+            ALIAS="dod-temp"
+            KS_PASS=$(openssl rand -hex 16)
+            KEY_PASS="$KS_PASS"
+            keytool -genkeypair \
+              -keystore "$KS" \
+              -alias "$ALIAS" \
+              -keyalg RSA \
+              -keysize 4096 \
+              -validity 10000 \
+              -storepass "$KS_PASS" \
+              -keypass "$KEY_PASS" \
+              -dname "CN=Dosya Dolabi (gecici), OU=Release, O=DoD Manager, C=TR"
+            KIND="temporary"
+            echo "UYARI: imza secret'ı yok; geçici anahtarla imzalanacak."
+          fi
+          echo "kind=$KIND" >> "$GITHUB_OUTPUT"
+
+          NAME="Dosya-Dolabi-${TAG}.apk"
+          case "$NAME" in
+            *nsigned*) echo "HATA: dosya adında 'unsigned' geçemez" >&2; exit 1 ;;
+          esac
+
+          "$SIGNER" sign \
+            --ks "$KS" \
+            --ks-key-alias "$ALIAS" \
+            --ks-pass "pass:$KS_PASS" \
+            --key-pass "pass:$KEY_PASS" \
+            --out "$NAME" \
+            aligned.apk
+
+          # İmza doğrulanamazsa iş burada durur; Release adımı çalışmaz.
+          "$SIGNER" verify --verbose --print-certs "$NAME" | tee verify.txt
+          grep -q "Signer #1 certificate DN:" verify.txt
+          if ! grep -q "Verified using v2 scheme" verify.txt; then
+            echo "HATA: APK Signature Scheme v2 doğrulanamadı" >&2
+            exit 1
+          fi
+
+          sha256sum "$NAME" > "$NAME.sha256"
+          echo "### İmza doğrulaması" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          cat verify.txt >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$KIND" = "permanent" ]; then
+            cat > release-notes.md <<EOF
+          Android 8.0+ (API 26) için Dosya Dolabı ${TAG}.
+
+          - Paket: com.dod.manager
+          - Sürüm: ${TAG#v} (versionCode 1)
+          - SHA-256: $(cut -d' ' -f1 "$NAME.sha256")
+
+          APK, projenin kalıcı sürüm anahtarıyla imzalandı; sonraki sürümler doğrudan güncellenebilir.
+          EOF
+          else
+            cat > release-notes.md <<EOF
+          Android 8.0+ (API 26) için Dosya Dolabı ${TAG}.
+
+          - Paket: com.dod.manager
+          - Sürüm: ${TAG#v} (versionCode 1)
+          - SHA-256: $(cut -d' ' -f1 "$NAME.sha256")
+
+          **Geçici anahtarla imzalandı.** APK kurulabilir ve imzası doğrulanmıştır; ancak
+          anahtar her derlemede değiştiği için sonraki sürümü kurmadan önce eski sürümü
+          kaldırmanız gerekebilir.
+
+          Kalıcı ve güncellenebilir imza için depoya şu secret'ları ekleyin:
+          ANDROID_KEY_BASE64, ANDROID_KEY_ALIAS, ANDROID_STORE_PASSWORD,
+          ANDROID_KEY_PASSWORD (README → İmzalama).
+          EOF
+          fi
+
+          echo "İmzalanan APK: $NAME"
+
+      - name: Eski sürüm kaydını temizle
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          # Aynı etiket için eski (imzasız) kayıt varsa kaldır; yeni APK temiz yüklenir.
+          gh release delete "$TAG" --yes --cleanup-tag || true
+
+      - name: İmza dosyalarını sil
         if: always()
-        run: rm -f "$RUNNER_TEMP/release.jks" src-tauri/gen/android/keystore.properties
+        run: |
+          rm -f "$RUNNER_TEMP/release.jks" "$RUNNER_TEMP/temp-release.jks" \
+            aligned.apk verify.txt src-tauri/gen/android/keystore.properties
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           name: Dosya Dolabı ${{ steps.version.outputs.tag }}
           generate_release_notes: true
+          body_path: release-notes.md
+          fail_on_unmatched_files: true
           files: |
-            ${{ steps.artifact.outputs.name }}
-            ${{ steps.artifact.outputs.name }}.sha256
-          body: |
-            Android 8.0+ (API 26) APK.
-
-            İmza secret'ları tanımlıysa APK imzalıdır; tanımlı değilse **imzasız**
-            yüklenir. İmzasız APK'yı kurmadan önce kendi anahtarınızla imzalayın:
-            `apksigner sign --ks release.jks --out Dod.apk Dosya-Dolabi-*.apk`
-            (ayrıntılar README → İmzalama).
-
-            Kurulum: "Bilinmeyen kaynaklardan yüklemeye izin ver"i açın.
-            Değişiklikler için CHANGELOG.md dosyasına bakın.
+            Dosya-Dolabi-${{ steps.version.outputs.tag }}.apk
+            Dosya-Dolabi-${{ steps.version.outputs.tag }}.apk.sha256

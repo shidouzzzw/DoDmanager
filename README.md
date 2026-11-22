@@ -98,7 +98,7 @@ rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-andro
 # Geliştirme (Vite + cihaz/emülatör)
 npm run tauri android dev
 
-# Release APK (imzasız ya da keystore.properties varsa imzalı)
+# Release APK (keystore.properties varsa yerelde imzalı)
 npm run tauri android build -- --apk
 ```
 
@@ -119,8 +119,17 @@ keyPassword=...
 CI için GitHub → Settings → Secrets and variables → Actions altında
 `ANDROID_KEY_BASE64` (base64 keystore), `ANDROID_KEY_ALIAS`, `ANDROID_STORE_PASSWORD`,
 `ANDROID_KEY_PASSWORD` tanımlayın; `release.yml` bunları geçici bir
-`keystore.properties` dosyasına yazar ve iş sonunda siler. Secret yoksa iş imzasız APK
-üretir; APK yine Release'e eklenir.
+`keystore.properties` dosyasına yazar ve iş sonunda siler.
+
+Secret'lar tanımlı değilse iş akışı `keytool` ile **geçici bir anahtar** üretir ve APK'yı
+onunla imzalar. Böylece yayınlanan APK her durumda kurulabilir; ancak geçici anahtar her
+derlemede değiştiği için sonraki sürüme güncelleme yapılamaz, önce eski sürümü kaldırmak
+gerekir. Bu durum Release açıklamasında belirtilir. Güncellenebilir sürümler için 4
+secret'ı bir kez tanımlamak yeterlidir.
+
+Yayından önce APK `apksigner sign` ile imzalanır ve `apksigner verify --print-certs` ile
+doğrulanır; doğrulama başarısızsa iş başarısız olur ve **imzasız APK asla Release'e
+yüklenmez**. `apksigner` çıktısı iş özetine (job summary) yazılır.
 
 `keystore.properties` üretimi:
 
@@ -129,6 +138,11 @@ keytool -genkeypair -v -keystore release.jks -alias dod \
   -keyalg RSA -keysize 4096 -validity 10000
 base64 -w0 release.jks   # ANDROID_KEY_BASE64
 ```
+
+`storeFile` alanı `android/` dizinine göre değil, depo köküne (`rootProject`) göre
+çözülür; mutlak yol veya depo kökünden göreli yol kullanın. `keystore.properties`
+yoksa veya `storeFile` satırı eksikse yerel Gradle derlemesi imzalamayı atlar ve
+bozulmaz.
 
 ### İzinler
 
