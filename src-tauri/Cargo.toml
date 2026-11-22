@@ -34,7 +34,7 @@ image = { version = "0.25", default-features = false, features = [
   "bmp",
 ] }
 # Yalnızca deflate: bzip2-sys C derleyicisi gerektirir; saf Rust zinciri tercih edilir.
-zip = { version = "2", default-features = false, features = ["deflate"] }
+zip = { version = "9", default-features = false, features = ["deflate"] }
 base64 = "0.22"
 uuid = { version = "1", features = ["v4"] }
 sha2 = "0.10"
