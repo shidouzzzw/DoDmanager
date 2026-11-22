@@ -120,6 +120,12 @@ jobs:
             ${{ steps.artifact.outputs.name }}
             ${{ steps.artifact.outputs.name }}.sha256
           body: |
-            Android 8.0+ (API 26) için imzalı/imzasız APK.
-            Kurulum: APK'yı indirin, "Bilinmeyen kaynaklardan yüklemeye izin ver"i açın.
+            Android 8.0+ (API 26) APK.
+
+            İmza secret'ları tanımlıysa APK imzalıdır; tanımlı değilse **imzasız**
+            yüklenir. İmzasız APK'yı kurmadan önce kendi anahtarınızla imzalayın:
+            `apksigner sign --ks release.jks --out Dod.apk Dosya-Dolabi-*.apk`
+            (ayrıntılar README → İmzalama).
+
+            Kurulum: "Bilinmeyen kaynaklardan yüklemeye izin ver"i açın.
             Değişiklikler için CHANGELOG.md dosyasına bakın.
