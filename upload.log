@@ -2,9 +2,18 @@
 + TAG=v0.1.0
 + APK=release-assets/Dosya-Dolabi-v0.1.0.apk
 + ls -la release-assets
-total 16
-drwxr-xr-x  2 runner runner 4096 Nov 23 00:32 .
-drwxr-xr-x 12 runner runner 4096 Nov 23 00:32 ..
--rw-r--r--  1 runner runner   90 Nov 23 00:32 Dosya-Dolabi-v0.1.0.apk.sha256
--rw-r--r--  1 runner runner  628 Nov 23 00:32 notes.md
+total 27680
+drwxr-xr-x  2 runner runner     4096 Nov 23 00:35 .
+drwxr-xr-x 12 runner runner     4096 Nov 23 00:35 ..
+-rw-r--r--  1 runner runner 28390070 Nov 23 00:35 Dosya-Dolabi-v0.1.0.apk
+-rw-r--r--  1 runner runner       90 Nov 23 00:35 Dosya-Dolabi-v0.1.0.apk.sha256
+-rw-r--r--  1 runner runner      628 Nov 23 00:35 notes.md
 + test -f release-assets/Dosya-Dolabi-v0.1.0.apk
++ sha256sum release-assets/Dosya-Dolabi-v0.1.0.apk
++ gh --version
+gh version 2.104.0 (2026-11-12)
+https://github.com/cli/cli/releases/tag/v2.104.0
++ gh release view v0.1.0
+gh: To use GitHub CLI in a GitHub Actions workflow, set the GH_TOKEN environment variable. Example:
+  env:
+    GH_TOKEN: ${{ github.token }}
