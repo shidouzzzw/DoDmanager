@@ -21,6 +21,8 @@ jobs:
       - name: APK'yı yükle
         id: upload
         continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           exec > >(tee upload.log) 2>&1
           set -x
@@ -30,8 +32,7 @@ jobs:
           ls -la release-assets
           test -f "$APK"
           sha256sum "$APK" > "$APK.sha256"
-          gh --version
-          gh release view "$TAG"
+          gh release view "$TAG" >/dev/null
           gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
           gh release edit "$TAG" --title "Dosya Dolabı ${TAG}" --notes-file release-assets/notes.md
           echo "### Yüklenen APK" >> "$GITHUB_STEP_SUMMARY"
