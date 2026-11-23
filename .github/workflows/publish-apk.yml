@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Hazır, imzalanmış APK'yı mevcut sürüm kaydına yükler (derleme yapmaz).
+name: APK yayınla
+
+on:
+  push:
+    branches:
+      - release-assets
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Release'i güncelle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: APK'yı yükle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG="v0.1.0"
+          APK="release-assets/Dosya-Dolabi-${TAG}.apk"
+          test -f "$APK"
+          sha256sum "$APK" > "$APK.sha256"
+          gh release view "$TAG" >/dev/null
+          gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
+          gh release edit "$TAG" --title "Dosya Dolabı ${TAG}" --notes-file release-assets/notes.md
+          echo "### Yüklenen APK" >> "$GITHUB_STEP_SUMMARY"
+          cat "$APK.sha256" >> "$GITHUB_STEP_SUMMARY"
