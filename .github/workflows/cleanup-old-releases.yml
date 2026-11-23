@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Sürümler sayfasında eski/bozuk APK kalmasın diye son sürüm dışındaki
+# Release kayıtlarını siler. Git etiketleri (tag) korunur; F-Droid ve
+# kaynak arşivleri etiketten üretilmeye devam eder.
+name: Eski sürüm kayıtlarını temizle
+
+on:
+  push:
+    branches:
+      - cleanup-release
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    name: Son sürüm dışındaki kayıtları sil
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Release kayıtlarını listele
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release list --limit 100
+
+      # latest=true olan kayıt korunur; diğerleri (ör. açılışta kapanan
+      # v0.1.0) silinir. Etiket silinmez: --cleanup-tag kullanılmıyor.
+      - name: Eski kayıtları sil
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          KEEP=$(gh release view --json tagName --jq .tagName)
+          echo "Korunacak sürüm: $KEEP"
+          gh release list --limit 100 --json tagName,isLatest \
+            --jq '.[] | select(.isLatest == false) | .tagName' |
+            while read -r TAG; do
+              [ -z "$TAG" ] && continue
+              echo "Siliniyor: $TAG"
+              gh release delete "$TAG" --yes || true
+            done
+          echo "### Kalan kayıtlar" >> "$GITHUB_STEP_SUMMARY"
+          gh release list --limit 100 >> "$GITHUB_STEP_SUMMARY"
