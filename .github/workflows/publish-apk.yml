@@ -19,16 +19,31 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: APK'yı yükle
-        env:
-          GH_TOKEN: ${{ github.token }}
+        id: upload
+        continue-on-error: true
         run: |
+          exec > >(tee upload.log) 2>&1
+          set -x
           set -euo pipefail
           TAG="v0.1.0"
           APK="release-assets/Dosya-Dolabi-${TAG}.apk"
+          ls -la release-assets
           test -f "$APK"
           sha256sum "$APK" > "$APK.sha256"
-          gh release view "$TAG" >/dev/null
+          gh --version
+          gh release view "$TAG"
           gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
           gh release edit "$TAG" --title "Dosya Dolabı ${TAG}" --notes-file release-assets/notes.md
           echo "### Yüklenen APK" >> "$GITHUB_STEP_SUMMARY"
           cat "$APK.sha256" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Hata günlüğünü repoya yaz
+        if: steps.upload.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f upload.log
+          git commit -m "Yükleme hatası günlüğü" || true
+          git push
+          exit 1
