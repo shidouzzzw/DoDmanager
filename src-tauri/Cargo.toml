@@ -1,6 +1,6 @@
 [package]
 name = "dod-manager"
-version = "0.1.0"
+version = "0.1.1"
 description = "Dosya Dolabı — Android için açık kaynak dosya yöneticisi"
 authors = ["DoD Manager Contributors"]
 edition = "2021"

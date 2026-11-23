@@ -40,6 +40,18 @@ cp "$OVERLAY/app/src/debug/AndroidManifest.xml" "$GEN/app/src/debug/AndroidManif
 cp "$OVERLAY/app/dod-rules.pro" "$GEN/app/dod-rules.pro"
 cp -R "$OVERLAY/app/src/main/res/." "$GEN/app/src/main/res/"
 
+# Gradle 9 / AGP 9 kaynak doğrulaması: dosya adı harfle başlamalı ve '@' içermemeli.
+# `tauri android init`, masaüstü simgelerini (128x128@2x.png, 32x32.png ...) da
+# drawable'a kopyalıyor; bu adlar geçersiz ve build'i düşürüyor.
+for dod_res in "$GEN"/app/src/main/res/drawable/*; do
+  [[ -e "$dod_res" ]] || continue
+  dod_base="$(basename "$dod_res")"
+  if [[ ! "$dod_base" =~ ^[a-z0-9_]+([.][a-z0-9]+)+$ ]]; then
+    echo "   geçersiz kaynak adı silindi: $dod_base"
+    rm -f "$dod_res"
+  fi
+done
+
 echo "→ Gradle ayarları (minSdk 26, targetSdk 36, documentfile)"
 python3 - "$GEN" <<'PY'
 import pathlib

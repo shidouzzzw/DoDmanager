@@ -1,8 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <resources>
-    <!-- Sistem çubukları saydam; güvenli alan CSS env() ile yönetilir. -->
-    <style name="Theme.DosyaDolabi" parent="@android:style/Theme.Material.Light.NoActionBar">
+    <!--
+      Sistem çubukları saydam; güvenli alan CSS env() ile yönetilir.
+
+      Üst tema MUTLAKA AppCompat (veya türevi) olmalı: Tauri'nin WryActivity
+      sınıfı AppCompatActivity'ten türer ve AppCompat onCreate içinde temayı
+      doğrular. android:style/Theme.Material.* ile uygulama açılışta
+      "You need to use a Theme.AppCompat theme" istisnasıyla kapanır.
+    -->
+    <style name="Theme.DosyaDolabi" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>

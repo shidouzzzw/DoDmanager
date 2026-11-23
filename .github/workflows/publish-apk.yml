@@ -27,13 +27,20 @@ jobs:
           exec > >(tee upload.log) 2>&1
           set -x
           set -euo pipefail
-          TAG="v0.1.0"
+          TAG="v0.1.1"
           APK="release-assets/Dosya-Dolabi-${TAG}.apk"
           ls -la release-assets
           test -f "$APK"
           sha256sum "$APK" > "$APK.sha256"
-          gh release view "$TAG" >/dev/null
-          gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "$APK" "$APK.sha256" --clobber
+          else
+            gh release create "$TAG" \
+              --title "Dosya Dolabı ${TAG}" \
+              --notes-file release-assets/notes.md \
+              --target "$GITHUB_SHA" \
+              "$APK" "$APK.sha256"
+          fi
           gh release edit "$TAG" --title "Dosya Dolabı ${TAG}" --notes-file release-assets/notes.md
           echo "### Yüklenen APK" >> "$GITHUB_STEP_SUMMARY"
           cat "$APK.sha256" >> "$GITHUB_STEP_SUMMARY"

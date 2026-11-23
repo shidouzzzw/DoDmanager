@@ -10,6 +10,15 @@ proje [Semantic Versioning](https://semver.org/lang/tr/) kullanır.
 - Ekran görüntüleri ve F-Droid mağaza görselleri
 - İsteğe bağlı: çoklu pencere (tablet) düzeni
 
+## [0.1.1] - 2026-11-23
+
+### Düzeltildi
+
+- Uygulama açılışta kapanıyordu: Android teması `android:Theme.Material.*`
+  tabanlıydı, oysa Tauri'nin `WryActivity` sınıfı `AppCompatActivity`'ten türer ve
+  AppCompat `onCreate` içinde temayı doğrular. Tema
+  `Theme.AppCompat.Light.NoActionBar` üst temasına taşındı.
+
 ## [0.1.0] - 2026-11-22
 
 İlk sürüm. Android 8.0 (API 26) ve üzeri.
