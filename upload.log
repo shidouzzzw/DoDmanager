@@ -1,0 +1,10 @@
++ set -euo pipefail
++ TAG=v0.1.0
++ APK=release-assets/Dosya-Dolabi-v0.1.0.apk
++ ls -la release-assets
+total 16
+drwxr-xr-x  2 runner runner 4096 Nov 23 00:32 .
+drwxr-xr-x 12 runner runner 4096 Nov 23 00:32 ..
+-rw-r--r--  1 runner runner   90 Nov 23 00:32 Dosya-Dolabi-v0.1.0.apk.sha256
+-rw-r--r--  1 runner runner  628 Nov 23 00:32 notes.md
++ test -f release-assets/Dosya-Dolabi-v0.1.0.apk
